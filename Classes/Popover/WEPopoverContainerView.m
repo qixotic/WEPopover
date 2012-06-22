@@ -189,7 +189,7 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 					}
                     // If still going past right, resize width
                     if (theOffset.x + theSize.width > CGRectGetMaxX(displayArea)) {
-                        shift = CGRectGetMaxX(displayArea) - (theOffset.x + theSize.width);
+                        shift = theOffset.x + theSize.width - CGRectGetMaxX(displayArea);
                         theSize.width -= shift;
                     } 
                     // If going past the bottom bounds, resize height
@@ -235,9 +235,10 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
                         xArrowOffset -= shift;
                         theOffset.x += shift;
 					}
+
                     // If still going past right, resize width
                     if (theOffset.x + theSize.width > CGRectGetMaxX(displayArea)) {
-                        shift = CGRectGetMaxX(displayArea) - (theOffset.x + theSize.width);
+                        shift =  theOffset.x + theSize.width - CGRectGetMaxX(displayArea);
                         theSize.width -= shift;
                     } 
                     // If going past the top bounds, resize height and shift offset
@@ -390,7 +391,7 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 			arrowImage = rightArrowImage;
 			break;
 	}
-	
+
 	NSAssert(!CGRectEqualToRect(bgRect, CGRectNull), @"bgRect is null");
 	
 }
