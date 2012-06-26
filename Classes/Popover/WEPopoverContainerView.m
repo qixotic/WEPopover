@@ -11,7 +11,7 @@
 @implementation WEPopoverContainerViewProperties
 
 @synthesize bgImageName, upArrowImageName, downArrowImageName, leftArrowImageName, rightArrowImageName, topBgMargin, bottomBgMargin, leftBgMargin, rightBgMargin, topBgCapSize, leftBgCapSize;
-@synthesize leftContentMargin, rightContentMargin, topContentMargin, bottomContentMargin, arrowMargin;
+@synthesize leftContentMargin, rightContentMargin, topContentMargin, bottomContentMargin, arrowMargin, noAnchor;
 
 
 @end
@@ -137,7 +137,46 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 	bgRect = CGRectNull;
 	arrowRect = CGRectZero;
 	arrowDirection = UIPopoverArrowDirectionUnknown;
-	
+
+    // If we have no anchor point, don't draw any arrows and just display the popup centered on and clipped to the display area.
+    if (properties.noAnchor) {
+        CGSize theSize = theContentSize;
+        CGPoint theOffset = CGPointZero;
+        CGFloat shift = 0.0;
+
+        // First center the content on the display area.
+        theOffset.x = CGRectGetMidX(displayArea) - theSize.width/2;
+        theOffset.y = CGRectGetMidY(displayArea) - theSize.height/2;
+
+        // If still going past right, resize width
+        if (theOffset.x + theSize.width > CGRectGetMaxX(displayArea)) {
+            shift = theOffset.x + theSize.width - CGRectGetMaxX(displayArea);
+            theSize.width -= shift;
+        }
+        // If going past the bottom bounds, resize height
+        if (theOffset.y + theSize.height > CGRectGetMaxY(displayArea)) {
+            shift = theOffset.y + theSize.height - CGRectGetMaxY(displayArea);
+            theSize.height -= shift;
+        }
+        // If still going past the top bounds, shift down and resize
+        if (theOffset.y < CGRectGetMinY(displayArea)) {
+            shift = CGRectGetMinY(displayArea) - theOffset.y;
+            theOffset.y += shift;
+            theSize.height -= shift;
+        }
+        // If going past the left bounds, shift right and resize width
+        if (theOffset.x < CGRectGetMinX(displayArea)) {
+            shift = CGRectGetMinX(displayArea) - theOffset.x;
+            theOffset.x += shift;
+            theSize.width -= shift;
+        }
+        offset = theOffset;
+        bgRect = CGRectMake(0, 0, theSize.width, theSize.height);
+        arrowImage = nil;
+        return;
+    }
+    // Otherwise, figure out which of the allowed arrow directions would yield the biggest surface area to display the popover.
+
 	CGFloat biggestSurface = 0.0f;
 
 	UIImage *upArrowImage = [UIImage imageNamed:properties.upArrowImageName];
